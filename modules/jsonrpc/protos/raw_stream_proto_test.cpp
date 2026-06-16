@@ -1,0 +1,209 @@
+/*
+ *     .============.
+ *    //  M A K E  / \
+ *   //  C++ DEV  /   \
+ *  //  E A S Y  /  \/ \
+ * ++ ----------.  \/\  .
+ *  \\     \     \ /\  /
+ *   \\     \     \   /
+ *    \\     \     \ /
+ *     -============'
+ *
+ * Copyright (c) 2023 Hevake and contributors, all rights reserved.
+ *
+ * This file is part of cpp-tbox (https://github.com/cpp-main/cpp-tbox)
+ * Use of this source code is governed by MIT license that can be found
+ * in the LICENSE file in the root of the source tree. All contributing
+ * project authors may be found in the CONTRIBUTORS.md file in the root
+ * of the source tree.
+ */
+#include <gtest/gtest.h>
+#include <tbox/base/json.hpp>
+#include <tbox/base/log_output.h>
+#include <tbox/base/defines.h>
+
+#include "raw_stream_proto.h"
+
+namespace tbox {
+namespace jsonrpc {
+
+TEST(RawStreamProto, sendRequest) {
+    LogOutput_Enable();
+
+    RawStreamProto proto;
+    //proto.setLogEnable(true);
+
+    int count = 0;
+    proto.setRecvCallback(
+        [&] (int id, const std::string &method, const Json &js_params) {
+            EXPECT_EQ(id, 1);
+            EXPECT_EQ(method, "test");
+            EXPECT_EQ(js_params, Json());
+            ++count;
+        },
+        [&] (int id, const Response &r) { ++count; UNUSED_VAR(id); UNUSED_VAR(r); }
+    );
+    proto.setSendCallback(
+        [&] (const void *data_ptr, size_t data_size) {
+            proto.onRecvData(data_ptr, data_size);
+        }
+    );
+
+    proto.sendRequest(1, "test");
+    EXPECT_EQ(count, 1);
+
+    LogOutput_Disable();
+}
+
+TEST(RawStreamProto, sendRequestWithParams) {
+    Json js_send_params = {
+        {"a", 123},
+        {"b", {"hello", "world", "!"}},
+    };
+    LogOutput_Enable();
+
+    RawStreamProto proto;
+    //proto.setLogEnable(true);
+
+    int count = 0;
+    proto.setRecvCallback(
+        [&] (int id, const std::string &method, const Json &js_params) {
+            EXPECT_EQ(id, 1);
+            EXPECT_EQ(method, "test");
+            EXPECT_EQ(js_params, js_send_params);
+            ++count;
+        },
+        [&] (int id, const Response &r) { ++count; UNUSED_VAR(id); UNUSED_VAR(r); }
+    );
+    proto.setSendCallback(
+        [&] (const void *data_ptr, size_t data_size) {
+            proto.onRecvData(data_ptr, data_size);
+        }
+    );
+
+    proto.sendRequest(1, "test", js_send_params);
+    EXPECT_EQ(count, 1);
+
+    LogOutput_Disable();
+}
+
+TEST(RawStreamProto, sendResult) {
+    Json js_send_result = {
+        {"a", 123},
+        {"b", {"hello", "world", "!"}},
+    };
+    LogOutput_Enable();
+
+    RawStreamProto proto;
+    //proto.setLogEnable(true);
+
+    int count = 0;
+    proto.setRecvCallback(
+        [&] (int id, const std::string &method, const Json &js_params) { ++count; UNUSED_VAR(id), UNUSED_VAR(method), UNUSED_VAR(js_params); },
+        [&] (int id, const Response &r) {
+            EXPECT_EQ(id, 1);
+            EXPECT_EQ(r.js_result, js_send_result);
+            ++count;
+        }
+    );
+    proto.setSendCallback(
+        [&] (const void *data_ptr, size_t data_size) {
+            proto.onRecvData(data_ptr, data_size);
+        }
+    );
+
+    proto.sendResult(1, js_send_result);
+    EXPECT_EQ(count, 1);
+
+    LogOutput_Disable();
+}
+
+TEST(RawStreamProto, sendError) {
+    LogOutput_Enable();
+
+    RawStreamProto proto;
+    //proto.setLogEnable(true);
+
+    int count = 0;
+    proto.setRecvCallback(
+        [&] (int id, const std::string &method, const Json &js_params) { ++count; UNUSED_VAR(id), UNUSED_VAR(method), UNUSED_VAR(js_params); },
+        [&] (int id, const Response &r) {
+            EXPECT_EQ(id, 1);
+            EXPECT_EQ(r.error.code, -1000);
+            EXPECT_EQ(r.error.message, "-1000");
+            ++count;
+        }
+    );
+    proto.setSendCallback(
+        [&] (const void *data_ptr, size_t data_size) {
+            proto.onRecvData(data_ptr, data_size);
+        }
+    );
+
+    proto.sendError(1, -1000, "-1000");
+    EXPECT_EQ(count, 1);
+
+    LogOutput_Disable();
+}
+
+TEST(RawStreamProto, RecvUncompleteData) {
+    LogOutput_Enable();
+
+    RawStreamProto proto;
+    //proto.setLogEnable(true);
+
+    int count = 0;
+    proto.setRecvCallback(
+        [&] (int id, const std::string &method, const Json &js_params) {
+            EXPECT_EQ(id, 1);
+            EXPECT_EQ(method, "test");
+            EXPECT_EQ(js_params, Json());
+            ++count;
+        },
+        [] (int, const Response &) { }
+    );
+
+    const char *str_1 = R"({"id":1,"meth)";
+    const char *str_2 = R"({"id":1,"method":"test","jsonrpc":"2.0"})";
+    EXPECT_EQ(proto.onRecvData(str_1, ::strlen(str_1)), 0);
+    EXPECT_EQ(proto.onRecvData(str_2, ::strlen(str_2)), ::strlen(str_2));
+
+    EXPECT_EQ(count, 1);
+    LogOutput_Disable();
+}
+
+//! 测试粘包与不完整包问题
+TEST(RawStreamProto, MultiPackages) {
+    LogOutput_Enable();
+
+    RawStreamProto proto;
+    //proto.setLogEnable(true);
+
+    int count = 0;
+    proto.setRecvCallback(
+        [&] (int id, const std::string &method, const Json &js_params) {
+            if (count == 0) {
+                EXPECT_EQ(method, "test1");
+            } else if (count == 1) {
+                EXPECT_EQ(method, "test2");
+            }
+            ++count;
+            UNUSED_VAR(id);
+            UNUSED_VAR(js_params);
+        },
+        [] (int, const Response &) { }
+    );
+
+    std::string str_1 = R"({"id":1,"method":"test1","jsonrpc":"2.0"})";
+    std::string str_2 = R"({"id":2,"method":"test2","jsonrpc":"2.0","params":{}})";
+    std::string str_3 = R"({"jsonrpc":"2.0)";
+    std::string str = str_1 + str_2 + str_3;
+
+    EXPECT_EQ(proto.onRecvData(str.c_str(), str.size()), (str_1.size() + str_2.size()));
+
+    EXPECT_EQ(count, 2);
+    LogOutput_Disable();
+}
+
+}
+}

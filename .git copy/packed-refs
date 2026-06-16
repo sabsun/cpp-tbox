@@ -1,0 +1,42 @@
+# pack-refs with: peeled fully-peeled 
+e2baa0eb74ca8501f402dcfab7ec43c0365d9077 refs/remotes/origin/develop
+cf34c7d3a9c01e35cfc0b48196214bd64624b9d2 refs/remotes/origin/feat/log-trunc
+84d7363d7c15cdaedae08806a65f34492be4921f refs/remotes/origin/feature-AbnormalExitHandler
+cda00d7c3e1f427d036610aed7dfdcf745f25812 refs/remotes/origin/feature-Broker
+ad8bfde5a546c0d617913abfea0d443d1154e7e9 refs/remotes/origin/feature-DBus
+da986eae03e226c62eec2b43c45f15e21bad78ae refs/remotes/origin/feature-Dns
+c46011bd41783ca848a1f7989a6cbf7159ee3a97 refs/remotes/origin/feature-DnsRequest
+9feaf39b9e9e335a53763aa3640048210b117b50 refs/remotes/origin/feature-FlowAction
+bbf0015915ffbf15ff26f0ca2cf94dbf116d7257 refs/remotes/origin/feature-TcpSSL
+c41d923434a0878d5167ff33675460ffc61794f9 refs/remotes/origin/feature-autotools
+06a72e3fc983a44296908aee2bb7435ed675f5d1 refs/remotes/origin/feature-cmake
+541759c31345d85f95f059f5278e2c7cd7421d39 refs/remotes/origin/feature-format
+4731ab2aea298061de18c1b0fdd6058708a41058 refs/remotes/origin/fix-ActionFinishIssue
+85d629a5989e6a3f3e51ff54eb3c9f0e8620b564 refs/remotes/origin/fix-CompileError
+adcda1b7e446f6e1a9dfedc0a8c4aaf64dc72aaa refs/remotes/origin/master
+5a9316870703a51d3dde2c3cfefeaf9861202ddb refs/remotes/origin/refactory-Flow
+00ca56b09cd629791b82285b7fb648c606f8dc4a refs/tags/1.10.11
+5ad9e4ce391d2f784967eeba427b6d36d42ab7fb refs/tags/1.10.4
+e0c672259d6df828c90a88b5747da4ed6c098833 refs/tags/2.2
+^4f99eb27da6314e91d59d9c0552180d7b52aa0dc
+0cfc600e6c8362850a3d411266895868e308bcee refs/tags/v1.10.14
+9d8531882de4237705eb8e3a35c4dee98aa999d1 refs/tags/v1.10.16
+8046afcdbc2e419808266d94eb7162b405014d46 refs/tags/v1.10.20
+5182c872f762dd6846ead1a95f02fa68b169d027 refs/tags/v1.10.23
+9a82fddca18306f083ffe6f3e5a377c7deb803a6 refs/tags/v1.10.27
+808edb496b0b787eb97883ba8af91487380d8950 refs/tags/v1.10.5
+db05e1192c56ae3145c2297c1e4dc7b3e0e645e9 refs/tags/v1.11.0
+26eef30589f6b2ee03fd3e8dc023e4e3a942b864 refs/tags/v1.11.11
+988c58e12b72233a3c7d88618eac33149d79b367 refs/tags/v1.11.12
+5ca3587112941efa1b92c97a11da7c4301e9875e refs/tags/v1.11.14
+c0c8383e7ea8a55ec766cda20d73328acdf249b8 refs/tags/v1.11.2
+c07a4f7546e702cf36d647e257f5f0c79fedc711 refs/tags/v1.11.4
+c1cb136aa1d2598e7246bdeedd56bca4d08789a7 refs/tags/v1.11.5
+7d84705b39cb7d89723f7bd55486dd9139477e70 refs/tags/v1.12.0
+21f9cf3b9072b86dbf0b3796c12c45030bee2d51 refs/tags/v1.12.25
+3280a55c34279daed07eb3d7ec30c0c736c8993e refs/tags/v1.12.28
+c1e518be7a1cf373a36ae91455e770cf476a261e refs/tags/v1.13.2
+^4292a1298d4da28994a35014d0df2b40239ab7de
+58d8532dc3ca622f973885b4dff9d8e19eb8a063 refs/tags/v2.0
+^3f788ad2df358823a7b76ef50b4694778fa59640
+f4de0b62573d712489a5b57c16dabbde5f5ba392 refs/tags/v2.1
